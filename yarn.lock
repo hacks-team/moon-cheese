@@ -1384,12 +1384,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@suspensive/react@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "@suspensive/react@npm:3.4.0"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/f99ffd08587d99ffcf0ac833c14fa9b7cc598b56e5dc1bbf5b625fe84909ef2a9e58e4c1cacc1ed7da64ddfe58209c72d1a58050b9240a65c1a0872f1d8f50dc
+  languageName: node
+  linkType: hard
+
 "@swc/helpers@npm:^0.5.0":
   version: 0.5.17
   resolution: "@swc/helpers@npm:0.5.17"
   dependencies:
     tslib: "npm:^2.8.0"
   checksum: 10c0/fe1f33ebb968558c5a0c595e54f2e479e4609bff844f9ca9a2d1ffd8dd8504c26f862a11b031f48f75c95b0381c2966c3dd156e25942f90089badd24341e7dbb
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.83.1":
+  version: 5.83.1
+  resolution: "@tanstack/query-core@npm:5.83.1"
+  checksum: 10c0/3eeacf678fcf9803585f1be74979548a33c7f659b8d5f33c1e3b3834ef3b9f3401070b2e2d38bbaa9c6e5a3c359baaa3828078e38007b7c99fb8c9f1e3911142
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.84.2":
+  version: 5.84.2
+  resolution: "@tanstack/react-query@npm:5.84.2"
+  dependencies:
+    "@tanstack/query-core": "npm:5.83.1"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/491914f8c61c5bb83e1eece53b33552d0d490ba9f122add35ae3078f10f675a6b0786c2e1d5940ccb9acf490d28c525d56893576c237090c22bfc70ef2ee0f3f
   languageName: node
   linkType: hard
 
@@ -5641,6 +5668,8 @@ __metadata:
     "@ark-ui/react": "npm:^5.18.1"
     "@eslint/js": "npm:^9.30.1"
     "@pandacss/dev": "npm:^0.54.0"
+    "@suspensive/react": "npm:^3.4.0"
+    "@tanstack/react-query": "npm:^5.84.2"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@types/jest": "npm:^30.0.0"

@@ -1,8 +1,13 @@
-import { RouterProvider } from "react-router";
-import router from "./router";
+import { RouterProvider } from 'react-router';
+import GlobalProvider from './provider/GlobalProvider';
+import router from './router';
 
 function App() {
-	return <RouterProvider router={router} />;
+  return (
+    <GlobalProvider>
+      <RouterProvider router={router} />
+    </GlobalProvider>
+  );
 }
 
 export default App;
