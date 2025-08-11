@@ -1,6 +1,10 @@
-import { afterAll, afterEach, beforeAll } from "vitest";
-import { server } from "@/server/node";
+import { cleanup } from '@testing-library/react';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from '@/server/node';
 
 beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  cleanup();
+});
 afterAll(() => server.close());
