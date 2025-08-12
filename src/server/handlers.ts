@@ -3,8 +3,8 @@ import {
 	GRADE_POINTS,
 	gradePointList,
 	gradeShippingList,
+	products as PRODUCTS,
 	type Product,
-	products,
 	recommendProductIdMap,
 } from "./data";
 
@@ -17,6 +17,7 @@ type RecentProduct = {
 	price: number;
 };
 
+const products = [...PRODUCTS];
 const defaultRecentProducts = convertToRecentProduct([
 	products[0],
 	products[1],
@@ -226,6 +227,16 @@ export const handlers = [
 			const purshaedProducts = products.filter((product) =>
 				body.some(({ productId }) => productId === product.id),
 			);
+
+			products.forEach((product) => {
+				const quantity = body.find(
+					({ productId }) => productId === product.id,
+				)?.quantity;
+
+				if (quantity) {
+					product.stock -= quantity;
+				}
+			});
 
 			recentProducts = convertToRecentProduct(purshaedProducts);
 
