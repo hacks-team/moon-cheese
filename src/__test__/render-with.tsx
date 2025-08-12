@@ -3,7 +3,6 @@ import type { ReactElement, ReactNode } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import PageLayout from '@/layout/PageLayout';
 import GlobalProvider from '@/provider/GlobalProvider';
-import type { CartItem } from '@/types';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];
@@ -11,7 +10,6 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   router?: {
     initialEntries?: string[];
   };
-  initialCartItems?: CartItem[];
 }
 
 function AllTheProviders({ children, route = '/' }: { children: ReactNode; route?: string }) {
