@@ -7,6 +7,9 @@ import GlobalProvider from '@/provider/GlobalProvider';
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];
   route?: string;
+  router?: {
+    initialEntries?: string[];
+  };
 }
 
 function AllTheProviders({ children, route = '/' }: { children: ReactNode; route?: string }) {
