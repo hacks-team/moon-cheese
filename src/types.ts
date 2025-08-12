@@ -7,19 +7,32 @@ export type GradePoint = {
 
 export type ProductCategory = 'CHEESE' | 'CRACKER' | 'TEA';
 
-export type Product = {
+export type BaseProduct = {
   id: number;
   name: string;
-  category: ProductCategory;
   stock: number;
   price: number;
   description: string;
   detailDescription: string;
   images: string[];
   rating: number;
-  isGlutenFree?: boolean;
-  isCaffeineFree?: boolean;
 };
+
+interface Cracker extends BaseProduct {
+  category: 'CRACKER';
+  isGlutenFree: boolean;
+}
+
+interface Tea extends BaseProduct {
+  category: 'TEA';
+  isCaffeineFree: boolean;
+}
+
+interface Cheese extends BaseProduct {
+  category: 'CHEESE';
+}
+
+export type Product = Cracker | Tea | Cheese;
 
 export type CartItem = {
   productId: number;
