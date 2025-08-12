@@ -81,7 +81,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       await waitFor(
         () => {
-          const usdPrice = screen.queryByText(/\$.*10/) || screen.queryByText(/10\.00/);
+          const usdPrice = screen.findByText(/\$.*10/) || screen.findByText(/10\.00/);
           expect(usdPrice).toBeTruthy();
         },
         { timeout: 3000 }
@@ -122,7 +122,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
       // 초기 USD 가격 확인
       await waitFor(
         () => {
-          const initialPrice = screen.queryByText(/\$.*10/) || screen.queryByText(/10\.00/);
+          const initialPrice = screen.findByText(/\$.*10/) || screen.findByText(/10\.00/);
           expect(initialPrice).toBeTruthy();
         },
         { timeout: 3000 }
@@ -142,7 +142,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const convertedPrice = screen.queryByText(/13,000|13000/);
+            const convertedPrice = screen.findByText(/13,000|13000/);
 
             expect(convertedPrice).toBeTruthy();
           },
@@ -193,10 +193,10 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const krwPrice = screen.queryByText(/16,887|16887/);
+            const krwPrice = screen.findByText(/16,887|16887/);
 
             if (krwPrice) {
-              expect(krwPrice.textContent).not.toMatch(/\.\d/);
+              expect(krwPrice).not.match(/\.\d/);
             }
           },
           { timeout: 3000 }
@@ -302,8 +302,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const price1 = screen.queryByText(/13,000/) || screen.queryByText(/₩.*13/);
-            const price2 = screen.queryByText(/26,000/) || screen.queryByText(/₩.*26/);
+            const price1 = screen.findByText(/13,000/);
+            const price2 = screen.findByText(/26,000/);
 
             expect(price1 || price2).toBeTruthy();
           },
@@ -502,8 +502,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       await waitFor(
         () => {
-          const productName1 = screen.queryByText('월레스의 오리지널 웬슬리데일');
-          const productName2 = screen.queryByText('그랜드 데이 아웃 체다');
+          const productName1 = screen.findByText('월레스의 오리지널 웬슬리데일');
+          const productName2 = screen.findByText('그랜드 데이 아웃 체다');
 
           expect(productName1 || productName2).toBeTruthy();
         },
@@ -548,7 +548,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       await waitFor(
         () => {
-          const priceElement = screen.queryByText(/12\.99/) || screen.queryByText(/\$.*12/);
+          const priceElement = screen.findByText(/12\.99/);
           expect(priceElement).toBeTruthy();
         },
         { timeout: 3000 }
@@ -639,7 +639,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
       // 초기 USD 가격 확인
       await waitFor(
         () => {
-          const initialPrice = screen.queryByText(/\$.*10/) || screen.queryByText(/10\.00/);
+          const initialPrice = screen.findByText(/\$.*10/);
           expect(initialPrice).toBeTruthy();
         },
         { timeout: 3000 }
@@ -657,7 +657,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
         await waitFor(
           () => {
             const convertedPrice =
-              screen.queryByText(/13,000/) || screen.queryByText(/₩.*13/) || screen.queryByText(/원.*13/);
+              screen.findByText(/13,000/) || screen.findByText(/₩.*13/) || screen.findByText(/원.*13/);
 
             expect(convertedPrice).toBeTruthy();
           },
@@ -708,11 +708,10 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const krwPrice =
-              screen.queryByText(/16,887/) || screen.queryByText(/₩.*16,887/) || screen.queryByText(/원.*16,887/);
+            const krwPrice = screen.findByText(/16,887/);
 
             if (krwPrice) {
-              expect(krwPrice.textContent).not.toMatch(/\.\d/);
+              expect(krwPrice).not.match(/\.\d/);
               expect(krwPrice).toBeTruthy();
             }
           },
