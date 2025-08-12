@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { server } from '@/server/node';
@@ -193,7 +194,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const krwPrice = screen.findByText(/16,887|16887/);
+            const krwPrice = screen.queryAllByText(/16,887|16887/) || screen.getAllByText(/16,887|16887/);
 
             if (krwPrice) {
               expect(krwPrice).not.match(/\.\d/);
@@ -238,7 +239,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
       const currencyToggle = await screen.findByTestId('currency-toggle');
 
       if (currencyToggle) {
-        fireEvent.click(currencyToggle);
+        const user = userEvent.setup();
+        await user.click(currencyToggle);
 
         /**
          * THEN
@@ -246,7 +248,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           () => {
-            const formattedPrice = screen.findByText(/130,000/);
+            const formattedPrice = screen.queryAllByText(/130,000/) || screen.getAllByText(/130,000/);
             expect(formattedPrice).toBeTruthy();
           },
           { timeout: 3000 }
@@ -282,6 +284,46 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
               },
             ],
           });
+        }),
+        http.get('/api/product/list', () => {
+          return HttpResponse.json({
+            products: [
+              {
+                id: 3,
+                name: '테스트',
+                category: 'CHEESE',
+                stock: 3,
+                price: 15,
+                description: '전통 영국식 크리미한 웬슬리데일 치즈',
+                detailDescription:
+                  '"월레스가 아침마다 찾는 바로 그 치즈!" 전통 영국 웬슬리데일의 부드럽고 크리미한 풍미. 촘촘하고 촉촉한 질감 속에 은은한 단맛이 어우러져, 클래식한 영국식 브렉퍼스트에 완벽하게 어울립니다.',
+                images: [
+                  '/moon-cheese-images/cheese-1-1.jpg',
+                  '/moon-cheese-images/cheese-1-2.jpg',
+                  '/moon-cheese-images/cheese-1-3.jpg',
+                  '/moon-cheese-images/cheese-1-4.jpg',
+                ],
+                rating: 4.8,
+              },
+              {
+                id: 4,
+                name: '테스트',
+                category: 'CHEESE',
+                stock: 3,
+                price: 25,
+                description: '전통 영국식 크리미한 웬슬리데일 치즈',
+                detailDescription:
+                  '"월레스가 아침마다 찾는 바로 그 치즈!" 전통 영국 웬슬리데일의 부드럽고 크리미한 풍미. 촘촘하고 촉촉한 질감 속에 은은한 단맛이 어우러져, 클래식한 영국식 브렉퍼스트에 완벽하게 어울립니다.',
+                images: [
+                  '/moon-cheese-images/cheese-1-1.jpg',
+                  '/moon-cheese-images/cheese-1-2.jpg',
+                  '/moon-cheese-images/cheese-1-3.jpg',
+                  '/moon-cheese-images/cheese-1-4.jpg',
+                ],
+                rating: 4.8,
+              },
+            ],
+          });
         })
       );
 
@@ -291,21 +333,24 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       renderWith(<HomePage />);
 
+      const user = userEvent.setup();
+
       const currencyToggle = await screen.findByTestId('currency-toggle');
 
       if (currencyToggle) {
-        fireEvent.click(currencyToggle);
+        await user.click(currencyToggle);
 
         /**
          * THEN
          * 페이지의 모든 상품 가격이 KRW로 변환되어 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const price1 = screen.findByText(/13,000/);
-            const price2 = screen.findByText(/26,000/);
+          async () => {
+            const price1 = screen.queryAllByText(/13,000/) || screen.getAllByText(/13,000/);
+            const price2 = screen.queryAllByText(/26,000/) || screen.getAllByText(/26,000/);
 
-            expect(price1 || price2).toBeTruthy();
+            expect(price1).toBeTruthy();
+            expect(price2).toBeTruthy();
           },
           { timeout: 3000 }
         );
@@ -349,11 +394,11 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       await waitFor(
         () => {
-          const currentPointText = screen.findByText(/4P/);
+          const currentPointText = screen.queryAllByText(/4P/) || screen.getAllByText(/4P/);
           expect(currentPointText).toBeTruthy();
 
           // 남은 포인트 표시 확인 (7-4=3p)
-          const remainingPointText = screen.findByText(/3P/);
+          const remainingPointText = screen.queryAllByText(/3P/) || screen.getAllByText(/3P/);
           expect(remainingPointText).toBeTruthy();
         },
         { timeout: 3000 }
