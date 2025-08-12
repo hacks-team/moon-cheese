@@ -88,9 +88,9 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        */
       await waitFor(
         () => {
-          const productName = screen.getByText('치즈홀 크래커');
-          const productPrice = screen.getByText(/\$10\.85/);
-          const productDescription = screen.getByText(/달 표면에서 수확한 특별한 구멍낸 크래커/);
+          const productName = screen.findByText('치즈홀 크래커');
+          const productPrice = screen.findByText(/\$10\.85/);
+          const productDescription = screen.findByText(/달 표면에서 수확한 특별한 구멍낸 크래커/);
 
           expect(productName).toBeTruthy();
           expect(productPrice).toBeTruthy();
