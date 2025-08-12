@@ -1,5 +1,5 @@
+import { Box, type BoxProps, Flex, HStack, type HstackProps, Stack, type StackProps, styled } from 'styled-system/jsx';
 import { RatingGroup, Text, type TextProps } from '@/ui-lib';
-import { Box, Flex, HStack, Stack, styled, type BoxProps, type HstackProps, type StackProps } from 'styled-system/jsx';
 
 const ProductItemRoot = ({ children, onClick, ...props }: BoxProps) => {
   return (
