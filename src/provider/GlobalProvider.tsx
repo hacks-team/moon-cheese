@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { EnhancedToastProvider } from '@/ui-lib/components/toast';
 import { CartProvider } from './cart-provider';
 import { CurrencyProvider } from './currency-provider';
+import { DeliveryProvider } from './delivery-provider';
 
 const client = new QueryClient({
   defaultOptions: {
@@ -18,7 +19,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
     <QueryClientProvider client={client}>
       <CurrencyProvider>
         <CartProvider>
-          <EnhancedToastProvider>{children}</EnhancedToastProvider>
+          <DeliveryProvider>
+            <EnhancedToastProvider>{children}</EnhancedToastProvider>
+          </DeliveryProvider>
         </CartProvider>
       </CurrencyProvider>
     </QueryClientProvider>

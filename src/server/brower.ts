@@ -1,12 +1,12 @@
-import { type StartOptions, setupWorker } from "msw/browser";
-import { handlers } from "./handlers";
+import { type StartOptions, setupWorker } from 'msw/browser';
+import { handlers } from './handlers';
 
 export const server = setupWorker(...handlers);
 
 export const enableMocking = async (options?: StartOptions) => {
-	if (!import.meta.env.DEV) {
-		return;
-	}
+  if (!import.meta.env.DEV) {
+    return;
+  }
 
-	return server.start(options);
+  return server.start(options);
 };

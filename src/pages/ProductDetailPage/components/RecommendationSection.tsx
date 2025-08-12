@@ -1,51 +1,71 @@
-import { Spacing, Text } from "@/ui-lib";
-import { useNavigate } from "react-router";
-import { HStack, styled } from "styled-system/jsx";
-import RecommendationProductItem from "./RecommendationProductItem";
+import { ErrorBoundary } from '@suspensive/react';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import { Suspense, useMemo } from 'react';
+import { useNavigate } from 'react-router';
+import { HStack, styled } from 'styled-system/jsx';
+import ErrorSection from '@/components/ErrorSection';
+import { formatPriceByCurrency } from '@/format/price';
+import { useCurrency } from '@/provider/currency-provider';
+import { getProductListQueryOptions, getRecommendProductIdsQueryOptions } from '@/remotes/queries/product';
+import { Spacing, Text } from '@/ui-lib';
+import RecommendationProductItem from './RecommendationProductItem';
 
-function RecommendationSection() {
-    const navigate = useNavigate();
+type RecommendationSectionProps = {
+  productId: number;
+};
 
-    const handleClickProduct = (productId: number) => {
-        navigate(`/product/${productId}`);
-    };
+function RecommendationSectionContainer({ productId }: RecommendationSectionProps) {
+  const navigate = useNavigate();
+  const { currency, exchangeRate } = useCurrency();
 
-    return (
-        <styled.section css={{ bg: "background.01_white", px: 5, pt: 5, pb: 6 }}>
-            <Text variant="H2_Bold">추천 제품</Text>
+  const [
+    {
+      data: { recommendProductIds },
+    },
+    {
+      data: { products },
+    },
+  ] = useSuspenseQueries({
+    queries: [getRecommendProductIdsQueryOptions(productId), getProductListQueryOptions],
+  });
 
-            <Spacing size={4} />
+  const recommendProducts = useMemo(() => {
+    return products.filter(product => recommendProductIds.includes(product.id));
+  }, [products, recommendProductIds]);
 
-            <HStack gap={1.5} overflowX="auto">
-                <RecommendationProductItem.Root onClick={() => handleClickProduct(1)}>
-                    <RecommendationProductItem.Image
-                        src="/moon-cheese-images/cheese-1-1.jpg"
-                        alt="월레스의 오리지널 웬슬리데일"
-                    />
-                    <RecommendationProductItem.Info name="월레스의 오리지널 웬슬리데일" rating={4.0} />
-                    <RecommendationProductItem.Price>$12.99</RecommendationProductItem.Price>
-                </RecommendationProductItem.Root>
+  const handleClickProduct = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
 
-                <RecommendationProductItem.Root onClick={() => handleClickProduct(2)}>
-                    <RecommendationProductItem.Image
-                        src="/moon-cheese-images/tea-1-1.jpg"
-                        alt="그로밋의 잉글리쉬 브렉퍼스트 티"
-                    />
-                    <RecommendationProductItem.Info name="그로밋의 잉글리쉬 브렉퍼스트 티" rating={4.0} />
-                    <RecommendationProductItem.Price>$6.75</RecommendationProductItem.Price>
-                </RecommendationProductItem.Root>
+  return (
+    <styled.section css={{ bg: 'background.01_white', px: 5, pt: 5, pb: 6 }}>
+      <Text variant="H2_Bold">추천 제품</Text>
 
-                <RecommendationProductItem.Root onClick={() => handleClickProduct(3)}>
-                    <RecommendationProductItem.Image
-                        src="/moon-cheese-images/cheese-3-1.jpg"
-                        alt="크래이머 블루 치즈"
-                    />
-                    <RecommendationProductItem.Info name="크래이머 블루 치즈" rating={4.0} />
-                    <RecommendationProductItem.Price>$15.75</RecommendationProductItem.Price>
-                </RecommendationProductItem.Root>
-            </HStack>
-        </styled.section>
-    );
+      <Spacing size={4} />
+
+      <HStack gap={1.5} overflowX="auto">
+        {recommendProducts.map(product => (
+          <RecommendationProductItem.Root key={product.id} onClick={() => handleClickProduct(product.id)}>
+            <RecommendationProductItem.Image src={product.images[0]} alt={product.name} />
+            <RecommendationProductItem.Info name={product.name} rating={product.rating} />
+            <RecommendationProductItem.Price>
+              {formatPriceByCurrency(product.price * exchangeRate, currency)}
+            </RecommendationProductItem.Price>
+          </RecommendationProductItem.Root>
+        ))}
+      </HStack>
+    </styled.section>
+  );
+}
+
+function RecommendationSection({ productId }: RecommendationSectionProps) {
+  return (
+    <ErrorBoundary fallback={<ErrorSection />}>
+      <Suspense>
+        <RecommendationSectionContainer productId={productId} />
+      </Suspense>
+    </ErrorBoundary>
+  );
 }
 
 export default RecommendationSection;

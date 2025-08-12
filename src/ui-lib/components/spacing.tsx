@@ -1,9 +1,9 @@
 type SpacingProps = {
-	size: number;
+  size: number;
 };
 
 const Spacing = ({ size }: SpacingProps) => {
-	return <div style={{ height: `${size * 4}px` }} />;
+  return <div style={{ height: `${size * 4}px` }} />;
 };
 
 export default Spacing;
