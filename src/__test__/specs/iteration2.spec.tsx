@@ -1,9 +1,10 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { server } from '@/server/node';
 import HomePage from '../../pages/HomePage';
 import { renderWith } from '../render-with';
+import userEvent from '@testing-library/user-event';
 
 describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', () => {
   beforeEach(() => {
@@ -79,10 +80,10 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 상품들이 화면에 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const cheeseProduct = screen.getByText('월레스의 웬슬리데일');
-          const crackerProduct = screen.getByText('로봇 크런치 비스킷');
-          const teaProduct = screen.getByText('문라이트 카모마일 티');
+        async () => {
+          const cheeseProduct = await screen.findByText('월레스의 웬슬리데일');
+          const crackerProduct = await screen.findByText('로봇 크런치 비스킷');
+          const teaProduct = await screen.findByText('문라이트 카모마일 티');
 
           expect(cheeseProduct).toBeTruthy();
           expect(crackerProduct).toBeTruthy();
@@ -124,10 +125,10 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 상품 가격이 KRW로 변환되어 표시되어야 한다
        */
       await waitFor(
-        () => {
+        async () => {
           // 12.99 * 1300 = 16,887원
-          const convertedPrice = screen.getAllByText(/16,887/);
-          expect(convertedPrice.length).toBeGreaterThan(0);
+          const convertedPrice = await screen.findByText('16,887원');
+          expect(convertedPrice).toBeTruthy();
         },
         { timeout: 3000 }
       );
@@ -164,10 +165,10 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 모든 카테고리의 상품이 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const cheeseProduct = screen.getByText('월레스의 웬슬리데일');
-          const crackerProduct = screen.getByText('로봇 크런치 비스킷');
-          const teaProduct = screen.getByText('문라이트 카모마일 티');
+        async () => {
+          const cheeseProduct = await screen.findByText('월레스의 웬슬리데일');
+          const crackerProduct = await screen.findByText('로봇 크런치 비스킷');
+          const teaProduct = await screen.findByText('문라이트 카모마일 티');
 
           expect(cheeseProduct).toBeTruthy();
           expect(crackerProduct).toBeTruthy();
@@ -209,9 +210,9 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 치즈 상품만 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const cheeseProduct = screen.getByText('월레스의 웬슬리데일');
-          const crackerProduct = screen.queryByText(/로봇 크런치 비스킷/);
+        async () => {
+          const cheeseProduct = await screen.findByText('월레스의 웬슬리데일');
+          const crackerProduct = screen.queryByText('로봇 크런치 비스킷');
 
           expect(cheeseProduct).toBeTruthy();
           expect(crackerProduct).not.toBeInTheDocument();
@@ -251,8 +252,8 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 글루텐 프리 아이콘이 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const glutenFreeIcon = screen.queryByAltText('gluten-free');
+        async () => {
+          const glutenFreeIcon = await screen.findByAltText('gluten-free');
           expect(glutenFreeIcon).toBeTruthy();
         },
         { timeout: 3000 }
@@ -288,8 +289,8 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 카페인 프리 아이콘이 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const caffeineFreeIcon = screen.queryByAltText('decaffeine');
+        async () => {
+          const caffeineFreeIcon = await screen.findByAltText('decaffeine');
           expect(caffeineFreeIcon).toBeTruthy();
         },
         { timeout: 3000 }
@@ -327,10 +328,12 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
         expect(productSection).toBeTruthy();
       });
 
+      const user = userEvent.setup();
+
       const plusButtons = screen.getAllByRole('button', { name: /Increase value/i });
       if (plusButtons.length > 0) {
-        fireEvent.click(plusButtons[0]);
-        fireEvent.click(plusButtons[0]);
+        await user.click(plusButtons[0]);
+        await user.click(plusButtons[0]);
 
         /**
          * THEN
@@ -425,8 +428,8 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * THEN
        * 초기 상태에서 - 버튼이 비활성화되어야 한다
        */
-      await waitFor(() => {
-        const minusButtons = screen.getAllByRole('button', { name: /Decrease value/i });
+      await waitFor(async () => {
+        const minusButtons = await screen.findAllByRole('button', { name: /Decrease value/i });
         if (minusButtons.length > 0) {
           expect(minusButtons[0]).toHaveProperty('disabled', true);
         }
@@ -465,8 +468,8 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 상품 목록 섹션에 에러 메시지가 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const errorElement = screen.findByText(/서버 연결에 실패했어요/);
+        async () => {
+          const errorElement = await screen.findByText('서버 연결에 실패했어요');
           expect(errorElement).toBeTruthy();
         },
         { timeout: 3000 }
