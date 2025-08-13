@@ -87,10 +87,10 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * 상품 정보가 화면에 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const productName = screen.findByText('치즈홀 크래커');
-          const productPrice = screen.findByText(/\$10\.85/);
-          const productDescription = screen.findByText(/달 표면에서 수확한 특별한 구멍낸 크래커/);
+        async () => {
+          const productName = await screen.findByText('치즈홀 크래커');
+          const productPrice = await screen.findByText('$10.85');
+          const productDescription = await screen.findByText('달 표면에서 수확한 특별한 구멍낸 크래커');
 
           expect(productName).toBeTruthy();
           expect(productPrice).toBeTruthy();
@@ -132,10 +132,10 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * 가격이 KRW로 변환되어 표시되어야 한다
        */
       await waitFor(
-        () => {
+        async () => {
           // 10.85 * 1300 = 14,105원
-          const convertedPrice = screen.getAllByText(/14,105/);
-          expect(convertedPrice.length).toBeGreaterThan(0);
+          const convertedPrice = await screen.findByText('14,105원');
+          expect(convertedPrice).toBeTruthy();
         },
         { timeout: 3000 }
       );
@@ -172,8 +172,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * 장바구니 담기 버튼이 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const cartButton = screen.getByText('장바구니 담기');
+        async () => {
+          const cartButton = await screen.findByText('장바구니 담기');
           expect(cartButton).toBeTruthy();
         },
         { timeout: 3000 }
@@ -204,8 +204,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
         router: { initialEntries: ['/product/1'] },
       });
 
-      await waitFor(() => {
-        const cartButton = screen.getByText('장바구니 담기');
+      await waitFor(async () => {
+        const cartButton = await screen.findByText('장바구니 담기');
         expect(cartButton).toBeTruthy();
       });
       const user = userEvent.setup();
@@ -223,9 +223,9 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * THEN
        * 장바구니 아이콘에 뱃지가 표시되고 버튼이 "장바구니에서 제거"로 변경되어야 한다
        */
-      await waitFor(() => {
-        const cartBadge = screen.findByText('2');
-        const removeButton = screen.findByText('장바구니에서 제거');
+      await waitFor(async () => {
+        const cartBadge = await screen.findByText('2');
+        const removeButton = await screen.findByText('장바구니에서 제거');
 
         expect(cartBadge).toBeTruthy();
         expect(removeButton).toBeTruthy();
@@ -256,8 +256,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
         router: { initialEntries: ['/product/1'] },
       });
 
-      await waitFor(() => {
-        const cartButton = screen.getByText('장바구니 담기');
+      await waitFor(async () => {
+        const cartButton = await screen.findByText('장바구니 담기');
         expect(cartButton).toBeTruthy();
       });
 
@@ -273,11 +273,11 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * THEN
        * + 버튼과 - 버튼이 비활성화되어야 한다
        */
-      await waitFor(() => {
-        const plusButtons = screen.getAllByRole('button', {
+      await waitFor(async () => {
+        const plusButtons = await screen.findAllByRole('button', {
           name: /Increase value/i,
         });
-        const minusButtons = screen.getAllByRole('button', {
+        const minusButtons = await screen.findAllByRole('button', {
           name: /Decrease value/i,
         });
 
@@ -354,8 +354,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
         router: { initialEntries: ['/product/1'] },
       });
 
-      await waitFor(() => {
-        const cartButton = screen.getByText('장바구니 담기');
+      await waitFor(async () => {
+        const cartButton = await screen.findByText('장바구니 담기');
         expect(cartButton).toBeTruthy();
       });
 
@@ -367,8 +367,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
       const cartButton = screen.getByText('장바구니 담기');
       fireEvent.click(cartButton);
 
-      await waitFor(() => {
-        const removeButton = screen.getByText('장바구니에서 제거');
+      await waitFor(async () => {
+        const removeButton = await screen.findByText('장바구니에서 제거');
         expect(removeButton).toBeTruthy();
       });
 
@@ -379,8 +379,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * THEN
        * 장바구니 뱃지가 사라지고 버튼이 "장바구니 담기"로 변경되어야 한다
        */
-      await waitFor(() => {
-        const cartButton = screen.getByText('장바구니 담기');
+      await waitFor(async () => {
+        const cartButton = await screen.findByText('장바구니 담기');
         const cartBadge = screen.queryByText('1');
 
         expect(cartButton).toBeTruthy();
@@ -429,15 +429,15 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * 추천 상품들이 화면에 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const recommendationTitle = screen.getByText('추천 제품');
+        async () => {
+          const recommendationTitle = await screen.findByText('추천 제품');
           expect(recommendationTitle).toBeTruthy();
 
           // 추천 상품들이 화면에 있는지 확인
           const recommendProduct1 =
-            screen.findByText('월레스의 웬슬리데일') || screen.findByText(/월레스의.*웬슬리데일/);
+            (await screen.findByText('월레스의 웬슬리데일')) || (await screen.findByText(/월레스의.*웬슬리데일/));
           const recommendProduct2 =
-            screen.findByText('문라이트 카모마일 티') || screen.findByText(/문라이트.*카모마일.*티/);
+            (await screen.findByText('문라이트 카모마일 티')) || (await screen.findByText(/문라이트.*카모마일.*티/));
 
           expect(recommendProduct1).toBeTruthy();
           expect(recommendProduct2).toBeTruthy();
@@ -480,8 +480,8 @@ describe('ProductDetailPage Iteration 3 - 상품 상세 페이지 기능 검증'
        * 에러 메시지가 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const errorElement = screen.findByText(/서버 연결에 실패했어요/);
+        async () => {
+          const errorElement = await screen.findByText('서버 연결에 실패했어요');
           expect(errorElement).toBeTruthy();
         },
         { timeout: 3000 }

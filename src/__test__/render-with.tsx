@@ -2,7 +2,7 @@ import { type RenderOptions, render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import PageLayout from '@/layout/PageLayout';
-import GlobalProvider from '@/provider/GlobalProvider';
+import GlobalProvider from '@/providers/GlobalProvider';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];

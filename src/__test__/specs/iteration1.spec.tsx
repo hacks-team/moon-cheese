@@ -63,7 +63,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
                 id: 1,
                 thumbnail: '/moon-cheese-images/cheese-1-1.jpg',
                 name: '테스트 치즈',
-                price: 10.0,
+                price: 4.0,
               },
             ],
           });
@@ -81,8 +81,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * 기본 통화가 USD로 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const usdPrice = screen.findByText(/\$.*10/) || screen.findByText(/10\.00/);
+        async () => {
+          const usdPrice = await screen.findByText('$4');
           expect(usdPrice).toBeTruthy();
         },
         { timeout: 3000 }
@@ -120,19 +120,7 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        */
       renderWith(<HomePage />);
 
-      // 초기 USD 가격 확인
-      await waitFor(
-        () => {
-          const initialPrice = screen.findByText(/\$.*10/) || screen.findByText(/10\.00/);
-          expect(initialPrice).toBeTruthy();
-        },
-        { timeout: 3000 }
-      );
-
-      const currencyToggle =
-        screen.queryByRole('switch') ||
-        document.querySelector('[role="switch"]') ||
-        document.querySelector('input[type="checkbox"]');
+      const currencyToggle = await screen.findByTestId('currency-toggle');
 
       if (currencyToggle) {
         fireEvent.click(currencyToggle);
@@ -141,10 +129,12 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * THEN
          * 통화가 KRW로 변경되고 가격이 환율에 따라 변환되어야 한다
          */
+        // 초기 USD 가격 확인
         await waitFor(
-          () => {
-            const convertedPrice = screen.findByText(/13,000|13000/);
-
+          async () => {
+            const initialPrice = await screen.findByText('$10');
+            const convertedPrice = await screen.findByText('13,000원');
+            expect(initialPrice).toBeTruthy();
             expect(convertedPrice).toBeTruthy();
           },
           { timeout: 3000 }
@@ -193,8 +183,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * KRW 가격이 소수점 없이 반올림되어 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const krwPrice = screen.queryAllByText(/16,887|16887/) || screen.getAllByText(/16,887|16887/);
+          async () => {
+            const krwPrice = await screen.findByText('16,887원');
 
             if (krwPrice) {
               expect(krwPrice).not.match(/\.\d/);
@@ -247,8 +237,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * KRW 가격이 천단위 콤마와 함께 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const formattedPrice = screen.queryAllByText(/130,000/) || screen.getAllByText(/130,000/);
+          async () => {
+            const formattedPrice = await screen.findByText('130,000원');
             expect(formattedPrice).toBeTruthy();
           },
           { timeout: 3000 }
@@ -346,8 +336,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          */
         await waitFor(
           async () => {
-            const price1 = screen.queryAllByText(/13,000/) || screen.getAllByText(/13,000/);
-            const price2 = screen.queryAllByText(/26,000/) || screen.getAllByText(/26,000/);
+            const price1 = await screen.findByText('13,000원');
+            const price2 = await screen.findByText('26,000원');
 
             expect(price1).toBeTruthy();
             expect(price2).toBeTruthy();
@@ -393,12 +383,12 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * 현재 포인트와 다음 등급까지 남은 포인트가 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const currentPointText = screen.queryAllByText(/4P/) || screen.getAllByText(/4P/);
+        async () => {
+          const currentPointText = await screen.findByText('4P');
           expect(currentPointText).toBeTruthy();
 
           // 남은 포인트 표시 확인 (7-4=3p)
-          const remainingPointText = screen.queryAllByText(/3P/) || screen.getAllByText(/3P/);
+          const remainingPointText = await screen.findByText('3P');
           expect(remainingPointText).toBeTruthy();
         },
         { timeout: 3000 }
@@ -488,13 +478,10 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * => 현재등급, 최근 구매한 상품 모두 에러 메시지 표시
        */
       await waitFor(
-        () => {
-          const errorElements = screen.findAllByText(/서버 연결에 실패했어요/);
+        async () => {
+          const errorElements = await screen.findAllByText(/서버 연결에 실패했어요/);
           expect(errorElements).toBeTruthy();
-          errorElements.then(elements => {
-            expect(Array.isArray(elements)).toBe(true);
-            expect(elements).toHaveLength(2);
-          });
+          expect(errorElements).toHaveLength(2);
         },
         { timeout: 30000 }
       );
@@ -546,11 +533,12 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * 최근 구매한 상품의 이름이 화면에 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const productName1 = screen.findByText('월레스의 오리지널 웬슬리데일');
-          const productName2 = screen.findByText('그랜드 데이 아웃 체다');
+        async () => {
+          const productName1 = await screen.findByText('월레스의 오리지널 웬슬리데일');
+          const productName2 = await screen.findByText('그랜드 데이 아웃 체다');
 
-          expect(productName1 || productName2).toBeTruthy();
+          expect(productName1).toBeTruthy();
+          expect(productName2).toBeTruthy();
         },
         { timeout: 3000 }
       );
@@ -592,8 +580,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * 상품의 구매 금액이 USD 형식으로 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const priceElement = screen.findByText(/12\.99/);
+        async () => {
+          const priceElement = await screen.findByText('$12.99');
           expect(priceElement).toBeTruthy();
         },
         { timeout: 3000 }
@@ -641,8 +629,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * KRW 가격이 천단위 콤마와 함께 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const formattedPrice = screen.findByText(/1,300,000/);
+          async () => {
+            const formattedPrice = await screen.findByText('1,300,000원');
             expect(formattedPrice).toBeTruthy();
           },
           { timeout: 3000 }
@@ -683,8 +671,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
 
       // 초기 USD 가격 확인
       await waitFor(
-        () => {
-          const initialPrice = screen.findByText(/\$.*10/);
+        async () => {
+          const initialPrice = await screen.findByText('$10');
           expect(initialPrice).toBeTruthy();
         },
         { timeout: 3000 }
@@ -700,9 +688,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * 선택한 통화에 따라 가격이 환율에 맞게 변환되어 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const convertedPrice =
-              screen.findByText(/13,000/) || screen.findByText(/₩.*13/) || screen.findByText(/원.*13/);
+          async () => {
+            const convertedPrice = await screen.findByText('13,000원');
 
             expect(convertedPrice).toBeTruthy();
           },
@@ -752,8 +739,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * KRW 가격이 소수점 없이 반올림되어 표시되어야 한다
          */
         await waitFor(
-          () => {
-            const krwPrice = screen.findByText(/16,887/);
+          async () => {
+            const krwPrice = await screen.findByText('16,887원');
 
             if (krwPrice) {
               expect(krwPrice).not.match(/\.\d/);
@@ -795,8 +782,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
        * 최근 구매 상품 섹션에 에러 메시지가 표시되어야 한다
        */
       await waitFor(
-        () => {
-          const errorElement = screen.findByText(/서버 연결에 실패했어요/);
+        async () => {
+          const errorElement = await screen.findByText(/서버 연결에 실패했어요/);
           expect(errorElement).toBeTruthy();
         },
         { timeout: 3000 }
