@@ -122,6 +122,15 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
 
       const currencyToggle = await screen.findByTestId('currency-toggle');
 
+      // 초기 USD 가격 확인
+      await waitFor(
+        async () => {
+          const initialPrice = await screen.findByText('$10');
+          expect(initialPrice).toBeTruthy();
+        },
+        { timeout: 3000 }
+      );
+
       if (currencyToggle) {
         fireEvent.click(currencyToggle);
 
@@ -129,12 +138,9 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
          * THEN
          * 통화가 KRW로 변경되고 가격이 환율에 따라 변환되어야 한다
          */
-        // 초기 USD 가격 확인
         await waitFor(
           async () => {
-            const initialPrice = await screen.findByText('$10');
             const convertedPrice = await screen.findByText('13,000원');
-            expect(initialPrice).toBeTruthy();
             expect(convertedPrice).toBeTruthy();
           },
           { timeout: 3000 }
@@ -185,10 +191,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
         await waitFor(
           async () => {
             const krwPrice = await screen.findByText('16,887원');
-
-            if (krwPrice) {
-              expect(krwPrice).not.match(/\.\d/);
-            }
+            expect(krwPrice).toBeTruthy();
+            expect(krwPrice.textContent).not.toMatch(/\.\d/);
           },
           { timeout: 3000 }
         );
@@ -742,10 +746,8 @@ describe('HomePage Iteration 1 - 과제 구현 검증', () => {
           async () => {
             const krwPrice = await screen.findByText('16,887원');
 
-            if (krwPrice) {
-              expect(krwPrice).not.match(/\.\d/);
-              expect(krwPrice).toBeTruthy();
-            }
+            expect(krwPrice).toBeTruthy();
+            expect(krwPrice.textContent).not.toMatch(/\.\d/);
           },
           { timeout: 3000 }
         );
