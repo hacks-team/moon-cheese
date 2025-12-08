@@ -1,7 +1,12 @@
+import type { Product } from '@/types/product';
 import { http } from '@/utils/http';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
-type RecentProduct = {
+type ProductListResponse = {
+  products: Product[];
+};
+
+export type RecentProduct = {
   id: number;
   thumbnail: string;
   name: string;
@@ -12,8 +17,12 @@ type RecentProductResponse = {
   recentProducts: RecentProduct[];
 };
 
-export const recentProductQueries = createQueryKeys('recentProduct', {
+export const productQueries = createQueryKeys('product', {
   list: {
+    queryKey: null,
+    queryFn: () => http.get<ProductListResponse>('/api/product/list'),
+  },
+  recent: {
     queryKey: null,
     queryFn: () => http.get<RecentProductResponse>('/api/recent/product/list'),
   },
