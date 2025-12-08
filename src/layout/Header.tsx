@@ -1,3 +1,4 @@
+import { useCartValue } from '@/providers/CartProvider';
 import { useCurrencyContext } from '@/providers/CurrencyProvider';
 import Badge from '@/ui-lib/components/badge';
 import CurrencyToggle from '@/ui-lib/components/currency-toggle';
@@ -47,9 +48,10 @@ function BackButton() {
 
 function ShoppingCartButton() {
   const navigate = useNavigate();
+  const { totalQuantity } = useCartValue();
 
   return (
-    <Badge content={9} size="sm" cursor="pointer" onClick={() => navigate('/shopping-cart')}>
+    <Badge content={totalQuantity} size="sm" cursor="pointer" onClick={() => navigate('/shopping-cart')}>
       <ShoppingCartIcon size={22} />
     </Badge>
   );
