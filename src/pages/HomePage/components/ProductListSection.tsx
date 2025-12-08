@@ -1,23 +1,25 @@
-import { Counter, SubGNB, Text } from '@/ui-lib';
+import ErrorSection from '@/components/ErrorSection';
+import { queries } from '@/queries';
+import { SubGNB, Text } from '@/ui-lib';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Box, Grid, styled } from 'styled-system/jsx';
-import ProductItem from '../components/ProductItem';
+import type { FallbackProps } from 'react-error-boundary';
+import { Box, Center, Grid, styled } from 'styled-system/jsx';
+import { filterProductsByCategory, type CategoryFilter } from '../utils/category';
+import ProductCard from './ProductCard';
 
 function ProductListSection() {
-  const [currentTab, setCurrentTab] = useState('all');
-  const navigate = useNavigate();
-
-  const handleClickProduct = (productId: number) => {
-    navigate(`/product/${productId}`);
-  };
+  const [currentTab, setCurrentTab] = useState<CategoryFilter>('all');
 
   return (
     <styled.section bg="background.01_white">
       <Box css={{ px: 5, pt: 5, pb: 4 }}>
         <Text variant="H1_Bold">판매중인 상품</Text>
       </Box>
-      <SubGNB.Root value={currentTab} onValueChange={details => setCurrentTab(details.value)}>
+      {/* UI Component인 SubGNB는 string으로 넓게 가져가는게 범용성이 좋으므로 as 사용하게 두는것 같다
+      전에 제네릭 주입 UI컴포넌트 만들다가 피눈물 난 적 있었음...
+       */}
+      <SubGNB.Root value={currentTab} onValueChange={details => setCurrentTab(details.value as CategoryFilter)}>
         <SubGNB.List>
           <SubGNB.Trigger value="all">전체</SubGNB.Trigger>
           <SubGNB.Trigger value="cheese">치즈</SubGNB.Trigger>
@@ -25,59 +27,57 @@ function ProductListSection() {
           <SubGNB.Trigger value="tea">티</SubGNB.Trigger>
         </SubGNB.List>
       </SubGNB.Root>
-      <Grid gridTemplateColumns="repeat(2, 1fr)" rowGap={9} columnGap={4} p={5}>
-        <ProductItem.Root onClick={() => handleClickProduct(1)}>
-          <ProductItem.Image src="/moon-cheese-images/cheese-1-1.jpg" alt="월레스의 오리지널 웬슬리데일" />
-          <ProductItem.Info title="월레스의 오리지널 웬슬리데일" description="월레스가 아침마다 찾는 바로 그 치즈!" />
-          <ProductItem.Meta>
-            <ProductItem.MetaLeft>
-              <ProductItem.Rating rating={4} />
-              <ProductItem.Price>$12.99</ProductItem.Price>
-            </ProductItem.MetaLeft>
-          </ProductItem.Meta>
-          <Counter.Root>
-            <Counter.Minus onClick={() => {}} disabled={true} />
-            <Counter.Display value={3} />
-            <Counter.Plus onClick={() => {}} />
-          </Counter.Root>
-        </ProductItem.Root>
-
-        <ProductItem.Root onClick={() => handleClickProduct(2)}>
-          <ProductItem.Image src="/moon-cheese-images/cracker-1-1.jpg" alt="로봇 크런치 비스킷" />
-          <ProductItem.Info title="로봇 크런치 비스킷" description="로봇 캐릭터 모양의 귀리 비스킷" />
-          <ProductItem.Meta>
-            <ProductItem.MetaLeft>
-              <ProductItem.Rating rating={3} />
-              <ProductItem.Price>5.00</ProductItem.Price>
-            </ProductItem.MetaLeft>
-            <ProductItem.FreeTag type="gluten" />
-          </ProductItem.Meta>
-          <Counter.Root>
-            <Counter.Minus onClick={() => {}} disabled={true} />
-            <Counter.Display value={3} />
-            <Counter.Plus onClick={() => {}} />
-          </Counter.Root>
-        </ProductItem.Root>
-
-        <ProductItem.Root onClick={() => handleClickProduct(3)}>
-          <ProductItem.Image src="/moon-cheese-images/tea-1-1.jpg" alt="문라이트 카모마일 티" />
-          <ProductItem.Info title="문라이트 카모마일 티" description="달빛 같은 부드러운 허브차" />
-          <ProductItem.Meta>
-            <ProductItem.MetaLeft>
-              <ProductItem.Rating rating={5} />
-              <ProductItem.Price>$7.00</ProductItem.Price>
-            </ProductItem.MetaLeft>
-            <ProductItem.FreeTag type="caffeine" />
-          </ProductItem.Meta>
-          <Counter.Root>
-            <Counter.Minus onClick={() => {}} disabled={true} />
-            <Counter.Display value={3} />
-            <Counter.Plus onClick={() => {}} />
-          </Counter.Root>
-        </ProductItem.Root>
-      </Grid>
+      <ProductGrid category={currentTab} />
     </styled.section>
   );
 }
+
+interface ProductGridProps {
+  category: CategoryFilter;
+}
+
+function ProductGrid({ category }: ProductGridProps) {
+  const { data: productData } = useSuspenseQuery(queries.product.list);
+
+  const products = productData.products;
+  const filteredProducts = filterProductsByCategory(products, category);
+
+  return (
+    <Grid gridTemplateColumns="repeat(2, 1fr)" rowGap={9} columnGap={4} p={5}>
+      {filteredProducts.map(product => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </Grid>
+  );
+}
+
+function ProductListSectionSkeleton() {
+  return (
+    <styled.section bg="background.01_white">
+      <Box css={{ px: 5, pt: 5, pb: 4 }}>
+        <Text variant="H1_Bold">판매중인 상품</Text>
+      </Box>
+      <Center p={5} minH={200}>
+        <Text variant="B2_Bold" color="neutral.02_gray">
+          상품을 불러오는 중...
+        </Text>
+      </Center>
+    </styled.section>
+  );
+}
+
+function ProductListSectionError({ resetErrorBoundary }: FallbackProps) {
+  return (
+    <styled.section bg="background.01_white">
+      <Box css={{ px: 5, pt: 5, pb: 4 }}>
+        <Text variant="H1_Bold">판매중인 상품</Text>
+      </Box>
+      <ErrorSection onRetry={resetErrorBoundary} />
+    </styled.section>
+  );
+}
+
+ProductListSection.Skeleton = ProductListSectionSkeleton;
+ProductListSection.Error = ProductListSectionError;
 
 export default ProductListSection;
