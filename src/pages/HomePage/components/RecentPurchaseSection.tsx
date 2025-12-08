@@ -10,7 +10,7 @@ import { Flex, styled } from 'styled-system/jsx';
 
 /** 메인: 데이터 분기 담당 */
 function RecentPurchaseSection() {
-  const { data } = useSuspenseQuery(queries.recentProduct.list);
+  const { data } = useSuspenseQuery(queries.product.recent);
 
   if (data.recentProducts.length === 0) {
     return <RecentPurchaseSectionEmpty />;
@@ -45,7 +45,7 @@ function RecentPurchaseSectionEmpty() {
 /** 상품 목록 UI */
 function RecentPurchaseSectionList() {
   const [currency] = useCurrencyContext();
-  const { data } = useSuspenseQuery(queries.recentProduct.list);
+  const { data } = useSuspenseQuery(queries.product.recent);
   const { data: exchangeRateData } = useSuspenseQuery(queries.exchangeRate.current);
 
   const recentProducts = data.recentProducts;
@@ -134,7 +134,7 @@ function RecentPurchaseSectionError({ resetErrorBoundary }: FallbackProps) {
   const queryClient = useQueryClient();
 
   const handleRetry = () => {
-    queryClient.invalidateQueries({ queryKey: queries.recentProduct.list.queryKey });
+    queryClient.invalidateQueries({ queryKey: queries.product.recent.queryKey });
     resetErrorBoundary();
   };
 
