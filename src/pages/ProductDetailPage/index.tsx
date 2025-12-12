@@ -3,33 +3,83 @@ import ProductDetailSection from './components/ProductDetailSection';
 import ProductInfoSection from './components/ProductInfoSection';
 import RecommendationSection from './components/RecommendationSection';
 import ThumbnailSection from './components/ThumbnailSection';
+import { useParams } from 'react-router';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import { productQueryOptions } from '@/remotes/queries/product';
+import AsyncBoundary from '@/components/AsyncBoundary';
+import ErrorSection from '@/components/ErrorSection';
+import { categoryToTagType } from '@/constants/category';
+import { exchangeQueryOptions } from '@/remotes/queries/exchange';
+import { useCurrency } from '@/providers/CurrencyProvider';
+import { formatPrice } from '@/utils/price';
+import { Box, Stack, styled } from 'styled-system/jsx';
 
 function ProductDetailPage() {
   return (
+    <AsyncBoundary
+      errorFallback={({ onRetry }) => <ErrorSection onRetry={onRetry} />}
+      suspenseFallback={<ProductDetailPageSkeleton />}
+    >
+      <ProductDetailPageContainer />
+    </AsyncBoundary>
+  );
+}
+
+const ProductDetailPageContainer = () => {
+  const { id } = useParams();
+  const productId = Number(id);
+
+  if (!id || Number.isNaN(productId)) {
+    throw new Error('Product ID is required');
+  }
+
+  const { currency } = useCurrency();
+
+  const [{ data: product }, { data: exchangeRate }] = useSuspenseQueries({
+    queries: [productQueryOptions.productDetail(productId), exchangeQueryOptions.exchangeRate()],
+  });
+
+  return (
     <>
-      <ThumbnailSection
-        images={[
-          '/moon-cheese-images/cracker-1-1.jpg',
-          '/moon-cheese-images/cracker-1-2.jpg',
-          '/moon-cheese-images/cracker-1-3.jpg',
-          '/moon-cheese-images/cracker-1-4.jpg',
-        ]}
+      <ThumbnailSection images={product.images} />
+      <ProductInfoSection
+        key={product.id}
+        product={product}
+        category={categoryToTagType(product.category)}
+        formattedPrice={formatPrice(product.price, currency, exchangeRate)}
       />
-      <ProductInfoSection name={'치즈홀 크래커'} category={'cracker'} rating={4.0} price={10.85} quantity={2} />
 
       <Spacing size={2.5} />
 
-      <ProductDetailSection
-        description={
-          '"달 표면에서 가 수확한 특별한 구멍낸 크래커." 달의 분화구를 연상시키는 다지한과 고소한 풍미가 특징인 크래커. 치즈와의 궁합을 고려한 절묘한 비율로, 어느 데어링 메뉴도 잘 어울립니다.'
-        }
-      />
+      <ProductDetailSection description={product.detailDescription} />
 
       <Spacing size={2.5} />
 
       <RecommendationSection />
     </>
   );
-}
+};
+
+const ProductDetailPageSkeleton = () => (
+  <>
+    {/* 썸네일 */}
+    <styled.div css={{ w: 'full', aspectRatio: 1, bg: 'background.02_light-gray', animation: 'skeleton-pulse' }} />
+
+    {/* 상품 정보 */}
+    <Box css={{ bg: 'background.01_white', p: 5 }}>
+      <Stack gap={3}>
+        <styled.div
+          css={{ w: '60px', h: '24px', rounded: 'full', bg: 'background.02_light-gray', animation: 'skeleton-pulse' }}
+        />
+        <styled.div
+          css={{ w: '70%', h: '20px', rounded: 'md', bg: 'background.02_light-gray', animation: 'skeleton-pulse' }}
+        />
+        <styled.div
+          css={{ w: '40%', h: '28px', rounded: 'md', bg: 'background.02_light-gray', animation: 'skeleton-pulse' }}
+        />
+      </Stack>
+    </Box>
+  </>
+);
 
 export default ProductDetailPage;

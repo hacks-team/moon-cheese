@@ -12,7 +12,7 @@ function CheckoutSection() {
 
   const onClickPurchase = async () => {
     setIsPurchasing(true);
-    await delay(SECOND * 1);
+    await delay(Number(SECOND) * 1);
     setIsPurchasing(false);
     toast.success('결제가 완료되었습니다.');
     await delay(SECOND * 2);
