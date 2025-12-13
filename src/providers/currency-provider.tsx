@@ -1,6 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { createContext, useContext, useState } from 'react';
-import { getExchangeRateQueryOptions } from '@/remotes/queries/exchange';
 import type { Currency } from '@/type';
 
 type CurrencyContextType = {

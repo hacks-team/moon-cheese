@@ -2,6 +2,8 @@ import { type RenderOptions, render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import PageLayout from '@/layout/PageLayout';
+import { CartProvider } from '@/providers/cart-provider';
+import { CurrencyProvider } from '@/providers/currency-provider';
 import GlobalProvider from '@/providers/GlobalProvider';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {

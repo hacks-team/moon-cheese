@@ -1,8 +1,14 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getRecentProductList } from '../product';
+import { getProductList, getRecentProductList } from '../product';
 
 export const getRecentProductListQueryOptions = () =>
   queryOptions({
     queryKey: ['recent-product-list'],
     queryFn: getRecentProductList,
+  });
+
+export const getProductListQueryOptions = () =>
+  queryOptions({
+    queryKey: ['product-list'],
+    queryFn: getProductList,
   });

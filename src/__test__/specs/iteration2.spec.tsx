@@ -1,10 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { server } from '@/server/node';
 import HomePage from '../../pages/HomePage';
 import { renderWith } from '../render-with';
-import userEvent from '@testing-library/user-event';
 
 describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', () => {
   beforeEach(() => {
@@ -127,8 +127,9 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
       await waitFor(
         async () => {
           // 12.99 * 1300 = 16,887원
-          const convertedPrice = await screen.findByText('16,887원');
-          expect(convertedPrice).toBeTruthy();
+          // 여러 곳에 같은 가격이 표시될 수 있으므로 findAllByText 사용
+          const convertedPrices = await screen.findAllByText('16,887원');
+          expect(convertedPrices.length).toBeGreaterThan(0);
         },
         { timeout: 3000 }
       );
@@ -330,7 +331,9 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
 
       const user = userEvent.setup();
 
-      const plusButtons = screen.getAllByRole('button', { name: /Increase value/i });
+      const plusButtons = screen.getAllByRole('button', {
+        name: /Increase value/i,
+      });
       if (plusButtons.length > 0) {
         await user.click(plusButtons[0]);
         await user.click(plusButtons[0]);
@@ -429,7 +432,9 @@ describe('HomePage Iteration 2 - 상품 목록 및 장바구니 기능 검증', 
        * 초기 상태에서 - 버튼이 비활성화되어야 한다
        */
       await waitFor(async () => {
-        const minusButtons = await screen.findAllByRole('button', { name: /Decrease value/i });
+        const minusButtons = await screen.findAllByRole('button', {
+          name: /Decrease value/i,
+        });
         if (minusButtons.length > 0) {
           expect(minusButtons[0]).toHaveProperty('disabled', true);
         }
