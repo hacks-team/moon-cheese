@@ -17,6 +17,10 @@ type RecentProductResponse = {
   recentProducts: RecentProduct[];
 };
 
+type RecommendProductResponse = {
+  recommendProductIds: number[];
+};
+
 export const productQueries = createQueryKeys('product', {
   list: {
     queryKey: null,
@@ -26,4 +30,12 @@ export const productQueries = createQueryKeys('product', {
     queryKey: null,
     queryFn: () => http.get<RecentProductResponse>('/api/recent/product/list'),
   },
+  detail: (id: number) => ({
+    queryKey: [id],
+    queryFn: () => http.get<Product>(`/api/product/${id}`),
+  }),
+  recommend: (id: number) => ({
+    queryKey: [id],
+    queryFn: () => http.get<RecommendProductResponse>(`/api/product/recommend/${id}`),
+  }),
 });

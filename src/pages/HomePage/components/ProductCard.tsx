@@ -12,7 +12,7 @@ function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate();
   const [currency] = useCurrencyContext();
   const { getQuantity } = useCartValue();
-  const { addItem, removeItem } = useCartAction();
+  const { increaseQuantity, decreaseQuantity } = useCartAction();
 
   const { data: exchangeRateData } = useSuspenseQuery(queries.exchangeRate.current);
   const exchangeRate = exchangeRateData.exchangeRate;
@@ -27,12 +27,12 @@ function ProductCard({ product }: { product: Product }) {
 
   const handleIncrease = () => {
     if (quantity < product.stock) {
-      addItem(product.id);
+      increaseQuantity(product.id);
     }
   };
 
   const handleDecrease = () => {
-    removeItem(product.id);
+    decreaseQuantity(product.id);
   };
 
   return (

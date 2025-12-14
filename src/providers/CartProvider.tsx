@@ -16,8 +16,10 @@ interface CartValueContextType {
 
 // Action Context: 액션 함수들 (구독해도 리렌더링 없음)
 interface CartActionContextType {
-  addItem: (productId: number) => void;
-  removeItem: (productId: number) => void;
+  increaseQuantity: (productId: number) => void;
+  decreaseQuantity: (productId: number) => void;
+  addItemWithQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: number) => void;
   clearCart: () => void;
 }
 
@@ -38,14 +40,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const actionContext: CartActionContextType = useMemo(
     () => ({
-      addItem: (productId: number) => {
+      increaseQuantity: (productId: number) => {
         setItems(prev => {
           const existing = findItem(prev, productId);
           return existing ? updateQuantity(prev, productId, 1) : addNewItem(prev, productId);
         });
       },
 
-      removeItem: (productId: number) => {
+      decreaseQuantity: (productId: number) => {
         setItems(prev => {
           const existing = findItem(prev, productId);
           if (!existing) {
@@ -53,8 +55,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
 
           const isLastOne = existing.quantity === 1;
-          return isLastOne ? removeFromCart(prev, productId) : updateQuantity(prev, productId, -1);
+          return isLastOne ? removeItemFromCart(prev, productId) : updateQuantity(prev, productId, -1);
         });
+      },
+
+      addItemWithQuantity: (productId: number, quantity: number) => {
+        if (quantity <= 0) {
+          return;
+        }
+        setItems(prev => [...prev, { productId, quantity }]);
+      },
+
+      removeFromCart: (productId: number) => {
+        setItems(prev => removeItemFromCart(prev, productId));
       },
 
       clearCart: () => setItems([]),
@@ -100,7 +113,7 @@ function updateQuantity(items: CartItem[], productId: number, delta: number): Ca
   });
 }
 
-function removeFromCart(items: CartItem[], productId: number): CartItem[] {
+function removeItemFromCart(items: CartItem[], productId: number): CartItem[] {
   return items.filter(item => item.productId !== productId);
 }
 
