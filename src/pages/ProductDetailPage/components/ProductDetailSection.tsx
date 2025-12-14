@@ -1,5 +1,5 @@
-import { Spacing, Text } from '@/ui-lib';
 import { styled } from 'styled-system/jsx';
+import { Spacing, Text } from '@/ui-lib';
 
 type ProductDetailSectionProps = {
   description: string;

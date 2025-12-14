@@ -1,13 +1,20 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createContext, useContext, useState } from 'react';
-import type { Currency } from '@/type';
+import { getExchangeRateQueryOptions } from '@/remotes/queries/exchange';
+import type { Currency, ExchangeRate } from '@/type';
 
 type CurrencyContextType = {
   currency: Currency;
+  exchangeRate: ExchangeRate;
   setCurrency: (currency: Currency) => void;
 };
 
-const currencyContext = createContext<Pick<CurrencyContextType, 'currency'>>({
+const currencyContext = createContext<Pick<CurrencyContextType, 'currency' | 'exchangeRate'>>({
   currency: 'USD',
+  exchangeRate: {
+    KRW: 0,
+    USD: 0,
+  },
 });
 
 const currencyActionContext = createContext<Pick<CurrencyContextType, 'setCurrency'>>({
@@ -15,9 +22,12 @@ const currencyActionContext = createContext<Pick<CurrencyContextType, 'setCurren
 });
 
 const CurrencyProvider = ({ children }: { children: React.ReactNode }) => {
+  const {
+    data: { exchangeRate },
+  } = useSuspenseQuery(getExchangeRateQueryOptions());
   const [currency, setCurrency] = useState<Currency>('USD');
   return (
-    <currencyContext.Provider value={{ currency }}>
+    <currencyContext.Provider value={{ currency, exchangeRate }}>
       <currencyActionContext.Provider value={{ setCurrency }}>{children}</currencyActionContext.Provider>
     </currencyContext.Provider>
   );

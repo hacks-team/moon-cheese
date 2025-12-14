@@ -55,3 +55,8 @@ export interface TeaProduct {
 export type Product = CheeseProduct | CrackerProduct | TeaProduct;
 
 export type CartItem = Product;
+
+export type ExchangeRate = {
+  KRW: number;
+  USD: number;
+};

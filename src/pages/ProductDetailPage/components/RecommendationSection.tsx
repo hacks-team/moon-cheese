@@ -1,10 +1,37 @@
-import { Spacing, Text } from '@/ui-lib';
+import { ErrorBoundary } from '@suspensive/react';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import { Suspense } from 'react';
 import { useNavigate } from 'react-router';
 import { HStack, styled } from 'styled-system/jsx';
+import ErrorSection from '@/components/ErrorSection';
+import { formatPriceByCurrency } from '@/format/number';
+import { useCurrency } from '@/providers/currency-provider';
+import { getProductListQueryOptions, getRecommendProductIdsByProductIdQueryOptions } from '@/remotes/queries/product';
+import { Spacing, Text } from '@/ui-lib';
 import RecommendationProductItem from './RecommendationProductItem';
 
-function RecommendationSection() {
+interface RecommendationSectionProps {
+  productId: number;
+}
+
+function RecommendationSectionContainer({ productId }: RecommendationSectionProps) {
+  const recommendedProducts = useSuspenseQueries({
+    queries: [getRecommendProductIdsByProductIdQueryOptions(productId), getProductListQueryOptions()],
+    combine(result) {
+      const [
+        {
+          data: { recommendProductIds },
+        },
+        {
+          data: { products },
+        },
+      ] = result;
+      return products.filter(product => recommendProductIds.includes(product.id));
+    },
+  });
   const navigate = useNavigate();
+
+  const { currency, exchangeRate } = useCurrency();
 
   const handleClickProduct = (productId: number) => {
     navigate(`/product/${productId}`);
@@ -17,32 +44,34 @@ function RecommendationSection() {
       <Spacing size={4} />
 
       <HStack gap={1.5} overflowX="auto">
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(1)}>
-          <RecommendationProductItem.Image
-            src="/moon-cheese-images/cheese-1-1.jpg"
-            alt="월레스의 오리지널 웬슬리데일"
-          />
-          <RecommendationProductItem.Info name="월레스의 오리지널 웬슬리데일" rating={4.0} />
-          <RecommendationProductItem.Price>$12.99</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
-
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(2)}>
-          <RecommendationProductItem.Image
-            src="/moon-cheese-images/tea-1-1.jpg"
-            alt="그로밋의 잉글리쉬 브렉퍼스트 티"
-          />
-          <RecommendationProductItem.Info name="그로밋의 잉글리쉬 브렉퍼스트 티" rating={4.0} />
-          <RecommendationProductItem.Price>$6.75</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
-
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(3)}>
-          <RecommendationProductItem.Image src="/moon-cheese-images/cheese-3-1.jpg" alt="크래이머 블루 치즈" />
-          <RecommendationProductItem.Info name="크래이머 블루 치즈" rating={4.0} />
-          <RecommendationProductItem.Price>$15.75</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
+        {recommendedProducts.map(recommendedProduct => {
+          return (
+            <RecommendationProductItem.Root
+              key={recommendedProduct.id}
+              onClick={() => handleClickProduct(recommendedProduct.id)}
+            >
+              <RecommendationProductItem.Image src={recommendedProduct.images[0]} alt={recommendedProduct.name} />
+              <RecommendationProductItem.Info name={recommendedProduct.name} rating={recommendedProduct.rating} />
+              <RecommendationProductItem.Price>
+                {formatPriceByCurrency(recommendedProduct.price * exchangeRate[currency], currency)}
+              </RecommendationProductItem.Price>
+            </RecommendationProductItem.Root>
+          );
+        })}
       </HStack>
     </styled.section>
   );
 }
+
+const RecommendationSection = ErrorBoundary.with(
+  { fallback: ({ reset }) => <ErrorSection onRetry={reset} /> },
+  ({ productId }: RecommendationSectionProps) => {
+    return (
+      <Suspense>
+        <RecommendationSectionContainer productId={productId} />
+      </Suspense>
+    );
+  }
+);
 
 export default RecommendationSection;

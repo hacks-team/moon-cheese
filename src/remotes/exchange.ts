@@ -1,10 +1,8 @@
+import type { ExchangeRate } from '@/type';
 import { http } from '@/utils/http';
 
 interface ExchangeRateResponse {
-  exchangeRate: {
-    KRW: number;
-    USD: number;
-  };
+  exchangeRate: ExchangeRate;
 }
 
 export const getExchangeRate = async () => {

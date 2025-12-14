@@ -1,27 +1,19 @@
 import { ErrorBoundary } from '@suspensive/react';
-import { useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { Flex, styled } from 'styled-system/jsx';
 import ErrorSection from '@/components/ErrorSection';
 import { formatPriceByCurrency } from '@/format/number';
 import { useCurrency } from '@/providers/currency-provider';
-import { getExchangeRateQueryOptions } from '@/remotes/queries/exchange';
 import { getRecentProductListQueryOptions } from '@/remotes/queries/product';
 import { Spacing, Text } from '@/ui-lib';
 
 function RecentPurchaseSectionContainer() {
-  const [
-    {
-      data: { recentProducts },
-    },
-    {
-      data: { exchangeRate },
-    },
-  ] = useSuspenseQueries({
-    queries: [getRecentProductListQueryOptions(), getExchangeRateQueryOptions()],
-  });
+  const {
+    data: { recentProducts },
+  } = useSuspenseQuery(getRecentProductListQueryOptions());
 
-  const { currency } = useCurrency();
+  const { currency, exchangeRate } = useCurrency();
 
   return (
     <styled.section css={{ px: 5, pt: 4, pb: 8 }}>

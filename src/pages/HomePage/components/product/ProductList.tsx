@@ -1,5 +1,5 @@
 import { Suspense } from '@suspensive/react';
-import { useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { Grid } from 'styled-system/jsx';
@@ -7,7 +7,6 @@ import { formatPriceByCurrency } from '@/format/number';
 import type { ProductCategory } from '@/models/product';
 import { useCart } from '@/providers/cart-provider';
 import { useCurrency } from '@/providers/currency-provider';
-import { getExchangeRateQueryOptions } from '@/remotes/queries/exchange';
 import { getProductListQueryOptions } from '@/remotes/queries/product';
 import type { Product } from '@/type';
 import { Counter } from '@/ui-lib';
@@ -19,18 +18,11 @@ interface ProductListContainerProps {
 }
 
 const ProductListContainer = ({ category = 'ALL' }: ProductListContainerProps) => {
-  const [
-    {
-      data: { products },
-    },
-    {
-      data: { exchangeRate },
-    },
-  ] = useSuspenseQueries({
-    queries: [getProductListQueryOptions(), getExchangeRateQueryOptions()],
-  });
+  const {
+    data: { products },
+  } = useSuspenseQuery(getProductListQueryOptions());
   const navigate = useNavigate();
-  const { currency } = useCurrency();
+  const { currency, exchangeRate } = useCurrency();
   const { addCart, removeCart, carts } = useCart();
 
   const filteredProducts = useMemo(() => {
