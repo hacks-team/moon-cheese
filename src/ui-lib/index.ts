@@ -10,6 +10,7 @@ export { default as Spacing } from './components/spacing';
 export { default as SubGNB } from './components/sub-gnb';
 export { default as Tag } from './components/tag';
 export { default as Text } from './components/text';
+export { AsyncBoundary } from './components/AsyncBoundary';
 
 // Export component types
 export type { BadgeProps } from './components/badge';

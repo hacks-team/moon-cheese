@@ -1,5 +1,4 @@
 import { Box, styled } from 'styled-system/jsx';
-
 const IMAGE_SRC = '/moon-cheese-images/thumbnail.png';
 const LOGO_TEXT_SRC = '/moon-cheese-images/logo-text.png';
 

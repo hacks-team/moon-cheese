@@ -1,9 +1,31 @@
 import { Spacing, Text } from '@/ui-lib';
-import { useNavigate } from 'react-router';
-import { HStack, styled } from 'styled-system/jsx';
+import { useNavigate, useParams } from 'react-router';
+import { HStack, styled, Box } from 'styled-system/jsx';
 import RecommendationProductItem from './RecommendationProductItem';
+import { useRecommendedProductList, useRecommendedProductDetails } from '@/lib/api/products';
+import { AsyncBoundary } from '@/ui-lib/components/AsyncBoundary';
+import ErrorSection from '@/components/ErrorSection';
+import type { Product } from '@/lib/types/products';
+import { formatCurrencyPrice } from '@/utils/format';
+import { useCurrencyContext } from '@/providers/CurrencyProvider';
+import { useExchangeRate } from '@/lib/api/common';
+import { convertCurrencyPrice } from '@/utils/calculate';
+
+// 아쉬운점
+// queries 를 사용하고 있지만 suspense 를 로딩과 사용하고 있지 않음
+// 로직이 전체적으로 너무 더러움
 
 function RecommendationSection() {
+  const { id } = useParams<{ id: string }>();
+  const recommendedProductList = useRecommendedProductList(Number(id));
+  const recommendedProductDetailArray = useRecommendedProductDetails(recommendedProductList.data);
+  const recommendedProducts = recommendedProductDetailArray.map(detail => detail.data).filter(Boolean) as Product[];
+  const exchangeRate = useExchangeRate();
+  const { currency } = useCurrencyContext();
+
+  const isLoading =
+    recommendedProductList.isFetching || recommendedProductDetailArray.some(detail => detail.isFetching);
+  const isError = recommendedProductList.isError || recommendedProductDetailArray.some(detail => detail.isError);
   const navigate = useNavigate();
 
   const handleClickProduct = (productId: number) => {
@@ -17,32 +39,44 @@ function RecommendationSection() {
       <Spacing size={4} />
 
       <HStack gap={1.5} overflowX="auto">
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(1)}>
-          <RecommendationProductItem.Image
-            src="/moon-cheese-images/cheese-1-1.jpg"
-            alt="월레스의 오리지널 웬슬리데일"
-          />
-          <RecommendationProductItem.Info name="월레스의 오리지널 웬슬리데일" rating={4.0} />
-          <RecommendationProductItem.Price>$12.99</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
-
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(2)}>
-          <RecommendationProductItem.Image
-            src="/moon-cheese-images/tea-1-1.jpg"
-            alt="그로밋의 잉글리쉬 브렉퍼스트 티"
-          />
-          <RecommendationProductItem.Info name="그로밋의 잉글리쉬 브렉퍼스트 티" rating={4.0} />
-          <RecommendationProductItem.Price>$6.75</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
-
-        <RecommendationProductItem.Root onClick={() => handleClickProduct(3)}>
-          <RecommendationProductItem.Image src="/moon-cheese-images/cheese-3-1.jpg" alt="크래이머 블루 치즈" />
-          <RecommendationProductItem.Info name="크래이머 블루 치즈" rating={4.0} />
-          <RecommendationProductItem.Price>$15.75</RecommendationProductItem.Price>
-        </RecommendationProductItem.Root>
+        <AsyncBoundary
+          isLoading={isLoading}
+          isError={isError}
+          loadingFallback={<RecommendationSectionSkeleton />}
+          errorFallback={
+            <ErrorSection
+              onRetry={() => {
+                recommendedProductList.refetch();
+                recommendedProductDetailArray.forEach(detail => detail.refetch());
+              }}
+            />
+          }
+        >
+          {recommendedProducts.map(product => {
+            return (
+              <styled.section key={product.id}>
+                <RecommendationProductItem.Root onClick={() => handleClickProduct(product.id)}>
+                  <RecommendationProductItem.Image src={product.images[0]} alt={product.name} />
+                  <RecommendationProductItem.Info name={product.name} rating={product.rating} />
+                  <RecommendationProductItem.Price>
+                    {formatCurrencyPrice(convertCurrencyPrice(product.price, currency, exchangeRate.data), currency)}
+                  </RecommendationProductItem.Price>
+                </RecommendationProductItem.Root>
+              </styled.section>
+            );
+          })}
+        </AsyncBoundary>
       </HStack>
     </styled.section>
   );
 }
 
 export default RecommendationSection;
+
+const RecommendationSectionSkeleton = () => {
+  return (
+    <HStack gap={1.5} overflowX="auto">
+      <Box width="100px" height="100px" />
+    </HStack>
+  );
+};

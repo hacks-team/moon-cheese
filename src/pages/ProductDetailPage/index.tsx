@@ -3,33 +3,61 @@ import ProductDetailSection from './components/ProductDetailSection';
 import ProductInfoSection from './components/ProductInfoSection';
 import RecommendationSection from './components/RecommendationSection';
 import ThumbnailSection from './components/ThumbnailSection';
+import { AsyncBoundary } from '@/ui-lib/components/AsyncBoundary';
+import { useParams } from 'react-router';
+import { useProductDetail } from '@/lib/api/products/products.services';
+import ErrorSection from '@/components/ErrorSection';
 
 function ProductDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const productDetail = useProductDetail(Number(id));
+  const { description, detailDescription, images } = productDetail.data;
+  const isLoading = productDetail.isFetching;
+  const isError = productDetail.isError;
+
+  // TODO:  상품 상세, 추천 목록 스켈레톤 및 에러처리 필요 ( 12.15 ) 전체적인 로직 점검
+
+  // 아쉬운점 -> currency 와 환율이 같은공간에서 관리하는게 좋을듯
+  // 현재 환율은 컴포넌트 내부에서 관리하고 있지만, currency는 전역적으로 관리하고 있음
+  // 이렇게 되면 환율이 변경될 때마다 컴포넌트를 리렌더링 해야 함
+  // 환율은 전역적으로 관리하고 있는게 좋을듯
+
+  // async boundary 와 관련해서 아쉬운점 -> 서스펜스 & 옵셔널
+
   return (
     <>
-      <ThumbnailSection
-        images={[
-          '/moon-cheese-images/cracker-1-1.jpg',
-          '/moon-cheese-images/cracker-1-2.jpg',
-          '/moon-cheese-images/cracker-1-3.jpg',
-          '/moon-cheese-images/cracker-1-4.jpg',
-        ]}
-      />
-      <ProductInfoSection name={'치즈홀 크래커'} category={'cracker'} rating={4.0} price={10.85} quantity={2} />
-
-      <Spacing size={2.5} />
-
-      <ProductDetailSection
-        description={
-          '"달 표면에서 가 수확한 특별한 구멍낸 크래커." 달의 분화구를 연상시키는 다지한과 고소한 풍미가 특징인 크래커. 치즈와의 궁합을 고려한 절묘한 비율로, 어느 데어링 메뉴도 잘 어울립니다.'
+      <AsyncBoundary
+        isLoading={isLoading}
+        isError={isError}
+        loadingFallback={<ProductDetailPageSkeleton />}
+        errorFallback={
+          <ErrorSection
+            onRetry={() => {
+              productDetail.refetch();
+            }}
+          />
         }
-      />
+      >
+        <ThumbnailSection images={images} />
+        <ProductInfoSection product={productDetail.data} />
 
-      <Spacing size={2.5} />
+        <Spacing size={2.5} />
 
+        <ProductDetailSection description={description + '\n' + detailDescription} />
+
+        <Spacing size={2.5} />
+      </AsyncBoundary>
       <RecommendationSection />
     </>
   );
 }
 
 export default ProductDetailPage;
+
+const ProductDetailPageSkeleton = () => {
+  return (
+    <div>
+      <div>Loading...</div>
+    </div>
+  );
+};
