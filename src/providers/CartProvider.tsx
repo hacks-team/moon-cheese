@@ -63,7 +63,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (quantity <= 0) {
           return;
         }
-        setItems(prev => [...prev, { productId, quantity }]);
+        setItems(prev => {
+          const existing = findItem(prev, productId);
+          return existing ? updateQuantity(prev, productId, quantity) : [...prev, { productId, quantity }];
+        });
       },
 
       removeFromCart: (productId: number) => {

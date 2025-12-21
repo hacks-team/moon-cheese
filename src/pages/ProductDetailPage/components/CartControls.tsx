@@ -35,12 +35,12 @@ type AddProps = {
 };
 
 function Add({ productId, stock }: AddProps) {
-  const localQuantity = useLocalQuantity(stock);
+  const localCart = useLocalCart(stock);
   const { addItemWithQuantity } = useCartAction();
 
   const handleAddToCart = () => {
-    addItemWithQuantity(productId, localQuantity.quantity);
-    localQuantity.reset();
+    addItemWithQuantity(productId, localCart.quantity);
+    localCart.reset();
   };
 
   return (
@@ -48,9 +48,9 @@ function Add({ productId, stock }: AddProps) {
       <Flex justify="space-between" alignItems="center">
         <StockInfo stock={stock} />
         <Counter.Root>
-          <Counter.Minus onClick={localQuantity.decrease} disabled={localQuantity.isMinusDisabled} />
-          <Counter.Display value={localQuantity.quantity} />
-          <Counter.Plus onClick={localQuantity.increase} disabled={localQuantity.isPlusDisabled} />
+          <Counter.Minus onClick={localCart.decrease} disabled={localCart.isMinusDisabled} />
+          <Counter.Display value={localCart.quantity} />
+          <Counter.Plus onClick={localCart.increase} disabled={localCart.isPlusDisabled} />
         </Counter.Root>
       </Flex>
       <Button fullWidth color="primary" size="lg" onClick={handleAddToCart}>
@@ -72,7 +72,7 @@ function StockInfo({ stock }: { stock: number }) {
   );
 }
 
-function useLocalQuantity(stock: number) {
+function useLocalCart(stock: number) {
   const [quantity, setQuantity] = useState(0);
 
   const decrease = () => setQuantity(prev => prev - 1);
