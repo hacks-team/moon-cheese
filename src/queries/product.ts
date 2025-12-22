@@ -21,6 +21,20 @@ type RecommendProductResponse = {
   recommendProductIds: number[];
 };
 
+export type PurchaseRequest = {
+  deliveryType: 'EXPRESS' | 'PREMIUM';
+  totalPrice: number;
+  items: Array<{
+    productId: number;
+    quantity: number;
+  }>;
+};
+
+/** 상품 구매 API */
+export function purchaseProduct(request: PurchaseRequest) {
+  return http.post<PurchaseRequest, null>('/api/product/purchase', request);
+}
+
 export const productQueries = createQueryKeys('product', {
   list: {
     queryKey: null,

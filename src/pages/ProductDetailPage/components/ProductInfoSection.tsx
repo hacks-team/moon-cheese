@@ -1,8 +1,8 @@
+import { CATEGORY_TO_TAG_TYPE } from '@/constants/product';
 import { useCurrencyContext } from '@/providers/CurrencyProvider';
 import { queries } from '@/queries';
 import type { ProductCategory } from '@/types/product';
 import { RatingGroup, Spacing, Text } from '@/ui-lib';
-import type { TagType } from '@/ui-lib/components/tag';
 import Tag from '@/ui-lib/components/tag';
 import { formatPrice } from '@/utils/currency';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -13,12 +13,6 @@ type ProductInfoSectionProps = {
   category: ProductCategory;
   rating: number;
   price: number;
-};
-
-const CATEGORY_TO_TAG_TYPE: Record<ProductCategory, TagType> = {
-  CHEESE: 'cheese',
-  CRACKER: 'cracker',
-  TEA: 'tea',
 };
 
 function ProductInfoSection({ name, category, rating, price }: ProductInfoSectionProps) {
