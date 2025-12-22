@@ -1,11 +1,14 @@
-import { useState } from 'react';
 import { Flex, Stack, styled } from 'styled-system/jsx';
 import { Spacing, Text } from '@/ui-lib';
 import { DeliveryIcon, RocketIcon } from '@/ui-lib/components/icons';
 
-function DeliveryMethodSection() {
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<string>('Express');
+interface DeliveryMethodSectionProps {
+  deliveryFee: number;
+  value?: 'EXPRESS' | 'PREMIUM';
+  onSelect?: (value: 'EXPRESS' | 'PREMIUM') => void;
+}
 
+function DeliveryMethodSection({ value, onSelect, deliveryFee }: DeliveryMethodSectionProps) {
   return (
     <styled.section css={{ p: 5, bgColor: 'background.01_white' }}>
       <Text variant="H2_Bold">배송 방식</Text>
@@ -18,16 +21,16 @@ function DeliveryMethodSection() {
           description="3-5일 후 도착 예정"
           icon={<DeliveryIcon size={28} />}
           price={0}
-          isSelected={selectedDeliveryMethod === 'Express'}
-          onClick={() => setSelectedDeliveryMethod('Express')}
+          isSelected={value === 'EXPRESS'}
+          onClick={() => onSelect?.('EXPRESS')}
         />
         <DeliveryItem
           title="Premium"
           description="당일 배송"
           icon={<RocketIcon size={28} />}
-          price={5}
-          isSelected={selectedDeliveryMethod === 'Premium'}
-          onClick={() => setSelectedDeliveryMethod('Premium')}
+          price={deliveryFee}
+          isSelected={value === 'PREMIUM'}
+          onClick={() => onSelect?.('PREMIUM')}
         />
       </Stack>
     </styled.section>

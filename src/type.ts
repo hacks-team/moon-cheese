@@ -60,3 +60,9 @@ export type ExchangeRate = {
   KRW: number;
   USD: number;
 };
+
+export interface GradeShippingList {
+  type: Grade;
+  shippingFee: number;
+  freeShippingThreshold: number;
+}

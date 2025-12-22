@@ -5,14 +5,18 @@ type CartContextType = {
   carts: CartItem[];
   addCart: (product: Product) => void;
   removeCart: (product: Product) => void;
-  clearCart: (productId?: number) => void;
+  clearCart: (productId: number) => void;
+  resetCart: () => void;
 };
+
+const noop = () => {};
 
 const CartContext = createContext<CartContextType>({
   carts: [],
-  addCart: () => {},
-  removeCart: () => {},
-  clearCart: () => {},
+  addCart: noop,
+  removeCart: noop,
+  clearCart: noop,
+  resetCart: noop,
 });
 
 type CartAction =
@@ -54,7 +58,13 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: 'CLEAR_CART', payload: productId });
   };
 
-  return <CartContext.Provider value={{ carts, addCart, removeCart, clearCart }}>{children}</CartContext.Provider>;
+  const resetCart: CartContextType['resetCart'] = () => {
+    dispatch({ type: 'CLEAR_CART' });
+  };
+
+  return (
+    <CartContext.Provider value={{ carts, addCart, removeCart, clearCart, resetCart }}>{children}</CartContext.Provider>
+  );
 };
 
 const useCart = () => {
